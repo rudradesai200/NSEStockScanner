@@ -1,0 +1,8 @@
+numpy
+typing
+pandas
+pandas_ta
+datetime
+tqdm
+requests
+urllib
