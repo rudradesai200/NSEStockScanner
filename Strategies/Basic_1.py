@@ -29,7 +29,7 @@ config = {
             {"type":"rising", "field": "EMA13","period": 3, "color": 2, "score": 2},
         ]
     },
-    
+
     "ExitConfig" : {
         "conditions": [
             {"type":"rangeMinus", "field1": "EMA13", "field2": "EMA52", "period": 3, "color": 0, "score": 1},

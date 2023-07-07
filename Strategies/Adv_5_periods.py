@@ -4,6 +4,8 @@ config = {
     "name": "Adv_BullishTargets_5_periods",
     "buy_threshold": 5,
     "sell_threshold": -3,
+    "interval": "1d",
+    "period": "730d"
 },
 
 'IndicatorConfig' : {

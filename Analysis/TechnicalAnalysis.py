@@ -42,7 +42,7 @@ class Signal:
 
         print('='*10)
         print("Ticker: "+ self.ticker)
-        print("Strength: "+str(self.strength))  
+        print("Strength: "+str(self.strength))
         print("Signal: "+color+str(self.verdict)+colors["RESET"])
         print("Messages: ")
         print("\n".join(self.messages))
@@ -70,16 +70,16 @@ class Signal:
             comb_signal.strength = buy_signal.strength - sell_signal.strength
 
         return comb_signal
-    
+
 class TechAnalysis:
 
     def __init__(self, ticker: str, data: pd.DataFrame):
         if (ticker is None):
             print("No ticker provided")
-        
+
         if (data is None):
             print("No data provided")
-        
+
         self.ticker = ticker
         self.data = data
         self.strength = 0
@@ -254,7 +254,7 @@ class TechAnalysis:
             return True
         else:
             return False
-    
+
     def __crossedFromAbove(self, field1, field2, period, color=1, score=0):
         """
         Checkf is field1 crossed field2 from above in the given period
@@ -269,7 +269,7 @@ class TechAnalysis:
             return True
         else:
             return False
-    
+
     def __bullishDivergence(self, field1, field2, period, color=1, score=0):
         """
         Checks if field1 gave lower peaks and field2 increased in the give period
@@ -279,14 +279,14 @@ class TechAnalysis:
         for i in range(1, period-1):
             if (self.data[field1][i] > self.data[field1][i-1]) and (self.data[field1][i] < self.data[field1][i+1]):
                 peaks.append(i)
-        
+
         for i in range(1, len(peaks)):
             if (self.data[field1][peaks[i]] < self.data[field1][peaks[i-1]]) and (self.data[field2][peaks[i]] > self.data[field2][peaks[i-1]]):
                 self.__addMsg(f"Bullish divergence between {field1} and {field2} in ({self.data.iloc[peaks[i]].name} - {self.data.iloc[peaks[i-1]].name}) interval", color, score)
                 return True
-        
+
         return False
-    
+
     def __bearishDivergence(self, field1, field2, period, color=1, score=0):
         """
         Checks if field1 gave higher peaks and field2 decreased in the give period
@@ -296,12 +296,12 @@ class TechAnalysis:
         for i in range(1, period-1):
             if (self.data[field1][i] > self.data[field1][i-1]) and (self.data[field1][i] < self.data[field1][i+1]):
                 peaks.append(i)
-        
+
         for i in range(1, len(peaks)):
             if (self.data[field1][peaks[i]] > self.data[field1][peaks[i-1]]) and (self.data[field2][peaks[i]] < self.data[field2][peaks[i-1]]):
                 self.__addMsg(f"Bearish divergence between {field1} and {field2} in ({self.data.iloc[peaks[i]].name} - {self.data.iloc[peaks[i-1]].name}) interval", color, score)
                 return True
-        
+
         return False
 
     def __resolve(self, origconfig):
@@ -321,7 +321,7 @@ class TechAnalysis:
         else:
             print("Incorrect resolve passed - "+config)
             return False
-    
+
     def ConfirmVerdict(self, config: dict, debug: bool = False) -> Signal:
         """
         Checks for verdict signals based on the configuration provided.\n
@@ -330,12 +330,12 @@ class TechAnalysis:
         If all conditions are met and atleast one indicator is present, it will confirm the verdict\n
         Confirmations are added to the messages only if the ticker is confirmed\n
         """
-        
+
         if 'indicators' not in config or not isinstance(config['indicators'], list):
             print("indicators field of list type in required in the config")
         if 'confirmations' not in config or not isinstance(config['confirmations'], list):
             print("confirmations field of list type in required in the config")
-        
+
         self.strength = 0
         self.messages = []
 
@@ -344,7 +344,7 @@ class TechAnalysis:
         verdict = False
         for indi in config['indicators']:
             verdict |= self.__resolve(indi)
-        
+
         if verdict or debug:
             sig.verdict = Verdict.CONFIRMED
             for conf in config["confirmations"]:
@@ -352,5 +352,4 @@ class TechAnalysis:
 
         sig.strength = self.strength
         sig.messages = self.messages
-        
         return sig

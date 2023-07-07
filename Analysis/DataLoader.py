@@ -1,6 +1,6 @@
 import pandas as pd
 import pandas_ta as ta
-
+import yfinance
 
 class DataLoader:
     def __init__(self, indicators_config: dict, data_dir: str = "StockData/"):
@@ -16,7 +16,6 @@ class DataLoader:
         apply_col = data[self.indicators_config['field']]
         for val in self.indicators_config.get('EMA', []):
             data['EMA'+str(val)] = ta.ema(close=apply_col, length=val)
-
         for val in self.indicators_config.get('SMA', []):
             data['SMA'+str(val)] = ta.sma(close=apply_col, length=val)
 
@@ -35,12 +34,14 @@ class DataLoader:
         if 'MACD' in self.indicators_config.keys():
             macd_dict = self.indicators_config['MACD']
             data[['macd','macd_histogram','macd_signal']] = ta.macd(apply_col,macd_dict.get('fast',12),macd_dict.get('slow',26),macd_dict.get('signal',9))
-        
+
         if 'OBV' in self.indicators_config.keys():
             data['obv'] = ta.obv(apply_col,data['volume'])
 
         if 'EWO' in self.indicators_config.keys():
             data['ewo'] = ta.sma(apply_col, '5') - ta.sma(apply_col, '35')
+
+        return data
 
     def cleanData(self, data: pd.DataFrame):
         data.drop_duplicates(inplace=True)
@@ -66,26 +67,25 @@ class DataLoader:
         # Reverse the dataframe to keep recent prices at the top
         # data = data.iloc[::-1]
         return data
-    
-    def getTickerData(self, ticker: str, interval: str, period: str) -> pd.DataFrame:
+
+    def getTickerData(self, ticker: str, interval: str = "1d", period: str = "730d") -> pd.DataFrame:
         """
         Tries to load data from yfinance. If ticker not found, tries to load it from the files stored in `data_dir` and cleans it for easier access. Supports TEST.
         """
         # Load data from yfinance
-        data = pd.DataFrame()
-        data = data.ta.ticker(ticker, interval=interval, period=period)
+        data = yfinance.Ticker(ticker if ticker.endswith(".NS") else ticker + ".NS").history(interval=interval, period=period)
         if data is None:
             print("yfinance didn't find the ticker. Trying to load the custom data from " + self.data_dir + ticker + ".csv")
-            
+
             # Load data and remove [' ','.'] from column names
             data = pd.read_csv(self.data_dir + ticker + ".csv")
-            
+
             # Clean data
             data = self.cleanData(data)
         else:
             # Clean yfinance data
             data.rename(columns=lambda x: str(x).replace(' ', '').replace('.', '').lower(), inplace=True)
-            
+
         # Check for data length
         if len(data) < self.indicators_config['requiredDataLength']:
             print("Error: Not sufficient data")
@@ -93,9 +93,6 @@ class DataLoader:
 
         if data is not None:
             # Add indicators
-            try:
-                self.AddIndicator(data)
-            except Exception as e:
-                print(repr(e))
-                return None
+            data = self.AddIndicator(data)
+
         return data.iloc[::-1]

@@ -9,7 +9,7 @@ class DataFetcher:
     def _getCookie(self):
         resp = requests.get("https://www.nseindia.com", headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
-        }) 
+        })
         cookies = resp.cookies
         # cookies = "; ".join(key + "=" + val for key, val in cookies.items())
         return cookies
@@ -19,7 +19,7 @@ class DataFetcher:
         def getDate(dayoff:int = 0):
             date = datetime.datetime.today() - datetime.timedelta(days=dayoff)
             return str(date.day) + '-' + (str(date.month) if date.month >= 10 else str('0' + str(date.month))) + '-' + str(date.year)
-                
+
         url = "https://www.nseindia.com/api/historical/cm/equity"
         params = {
             "symbol": symbol,
@@ -48,13 +48,13 @@ class DataFetcher:
         with open("../StockData/" + symbol + ".csv", "a") as fp:
             content = content.decode("utf-8-sig")
             lines = content.split("\n")
-            
+
             if updating:
                 lines = lines[1:]
-            
+
             for line in lines:
                 fp.write(line + "\n")
-            
+
         logging.info(f"==== symbol {symbol} fetched")
         return True
 
@@ -65,8 +65,7 @@ class DataFetcher:
         for symbol in symbols:
             for year in range(num_years):
                 if not (self.getCSV(symbol, (year+1)*365, year*365, (year != 0))):
-                    break                    
-        
+                    break
 
 if __name__ == "__main__":
     loader = DataFetcher()

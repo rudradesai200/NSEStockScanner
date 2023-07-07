@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
-from CodeBase1.constants import symbols
-from CodeBase1.DataLoader import DataLoader
-from CodeBase1.TechnicalAnalysis import TechAnalysis, Signal, Verdict
+from Analysis.constants import symbols
+from Analysis.DataLoader import DataLoader
+from Analysis.TechnicalAnalysis import TechAnalysis, Signal, Verdict
 from Strategies.MA_RSI_Long import config
-from CodeBase1.analysis import TickerAnalysis
+from analysis import TickerAnalysis
 import os
 
 def backTest(ticker: str, config: dict, test_period: int, capital: int, target_profit: int, stop_loss: int):
@@ -22,7 +22,7 @@ def backTest(ticker: str, config: dict, test_period: int, capital: int, target_p
     if data is None:
         print("Err2: Error in fetching data")
         return
-    
+
     for en in range(test_period):
         test_data = data[test_period-en:]
         curr_price = test_data.iloc[0]['close']
@@ -62,7 +62,7 @@ def backTest(ticker: str, config: dict, test_period: int, capital: int, target_p
                 print(f"Added Short on {test_data.iloc[0].name}")
                 inventory = - ((capital + pnl) // curr_price)
                 last_price = curr_price
-        
+
     if (inventory != 0):
         print(f"Remaining inventory: {inventory}")
 
@@ -75,27 +75,27 @@ def backTest(ticker: str, config: dict, test_period: int, capital: int, target_p
 if __name__ == "__main__":
 
     capital = 100000
-    period = 750
+    period = 720
     target_profit = 10
     stop_loss = -5
 
 
-    backTest("TITAN", config, period, capital, target_profit, stop_loss)
+    # backTest("TITAN", config, period, capital, target_profit, stop_loss)
 
     # Run on all symbols
-    # fp = open("TestResults/"+config["GeneralConfig"]["name"]+".txt", "w")
-    # fp.write("="*10 + "Summary" + "="*10 + "\n")
-    # fp.write(f"Capital: {capital}\n")
-    # fp.write(f"Test Period: {period}\n")
-    # fp.write(f"Target Profit: {target_profit}\n")
-    # fp.write(f"Stop Loss: {stop_loss}\n\n\n")
+    fp = open("TestResults/"+config["GeneralConfig"]["name"]+".txt", "w")
+    fp.write("="*10 + "Summary" + "="*10 + "\n")
+    fp.write(f"Capital: {capital}\n")
+    fp.write(f"Test Period: {period}\n")
+    fp.write(f"Target Profit: {target_profit}\n")
+    fp.write(f"Stop Loss: {stop_loss}\n\n\n")
 
-    # for file in os.listdir("StockData"):
-    #     print("="*10, file[:-4])
-    #     summary = backTest(file[:-4], config, period, capital, target_profit, stop_loss)
-    #     print("="*10)
+    for symbol in ["RELIANCE", "TATAMOTORS", "TATASTEEL", "HINDUNILVR", "COALINDIA", "IRCTC", "BHEL", "TITAN", "IEX", "AXISBANK"]:
+        print("="*10, symbol)
+        summary = backTest(symbol, config, period, capital, target_profit, stop_loss)
+        print("="*10)
 
-    #     fp.write("="*10 + file[:-4] + "="*10 + "\n")
-    #     fp.write(f"Pnl: {summary['PnL']}\nSignals: {summary['Signals']}\n\n")
+        fp.write("="*10 + symbol + "="*10 + "\n")
+        fp.write(f"Pnl: {summary['PnL']}\nSignals: {summary['Signals']}\n\n")
 
-    # fp.close()
+    fp.close()

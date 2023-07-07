@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
-from CodeBase1.constants import symbols
-from CodeBase1.DataLoader import DataLoader
-from CodeBase1.TechnicalAnalysis import TechAnalysis, Signal, Verdict
+from Analysis.constants import symbols
+from Analysis.DataLoader import DataLoader
+from Analysis.TechnicalAnalysis import TechAnalysis, Signal, Verdict
 from Strategies.Basic_1 import config
 from tqdm import tqdm
 
@@ -12,11 +12,11 @@ def TickerAnalysis(ticker: str, config: dict, data = None, debug:bool = False) -
         # Load Data
         dataloader = DataLoader(config['IndicatorConfig'])
         data = dataloader.getTickerData(ticker,  config["GeneralConfig"]["interval"], config["GeneralConfig"]["period"])
-        
+
         if data is None:
             print("Err2: Error in fetching data")
-            return 
-    
+            return
+
     # Run Analysis
     tech = TechAnalysis(ticker, data)
     buy_signal = tech.ConfirmVerdict(config['EntryConfig'], debug)
@@ -29,7 +29,7 @@ def TickerAnalysis(ticker: str, config: dict, data = None, debug:bool = False) -
 
 
 if __name__ == "__main__":
-    TickerAnalysis("RELIANCE.NS", config).print()
+    # TickerAnalysis("RELIANCE.NS", config).print()
 
-    # for symbol in ["RELIANCE", "TATAMOTORS", "TATASTEEL", "HINDUNILVR", "COALINDIA", "IRCTC", "BHEL", "TITAN", "IEX", "AXISBANK"]:
-        # TickerAnalysis(symbol, config).print()
+    for symbol in ["RELIANCE", "TATAMOTORS", "TATASTEEL", "HINDUNILVR", "COALINDIA", "IRCTC", "BHEL", "TITAN", "IEX", "AXISBANK"]:
+        TickerAnalysis(symbol, config).print()

@@ -4,6 +4,8 @@ config = {
         "buy_threshold": 2,
         "sell_threshold": 2,
         "type": "long",
+        "interval": "15m",
+        "period": "60d"
     },
 
     "IndicatorConfig" : {
@@ -25,7 +27,7 @@ config = {
             {'type':'crossedFromBelow','field1':'close','field2':'SMA200', "period": 5, 'color':3,'score': 5},
         ]
     },
-    
+
     "ExitConfig" : {
         "indicators": [
             [{"type":"falling", "field":"close", "period": 3, "color": -2,"score":1},
